@@ -15,3 +15,6 @@ datasets/
 
 # raw questionnaire answers stay private (only anonymised summaries are shared)
 questionnaire/
+
+# dashboard lookups (rebuilt by prepare_dashboard.py); LA names are small and kept
+outputs/app_data/*.parquet

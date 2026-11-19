@@ -20,7 +20,9 @@ from .anomaly import LABEL_NORMAL, ResidualAnomalyDetector
 from .config import ABLATION_SETS, PROPERTY_TYPE_NAMES, REGION_NAMES, Config
 from .data_loading import load_base_dataset, load_hpi
 from .evaluation import metrics_by_group, regression_metrics, to_price
-from .explain import FEATURE_LABELS, explain_row, global_importance, group_importance, shap_values
+from .dashboard_data import build_la_names, prepare as prepare_dashboard
+from .explain import (FEATURE_LABELS, explain_row, global_importance, group_importance, set_la_names,
+                      shap_values)
 from .features import FeatureBuilder
 from .models import fit_linear, fit_xgb, predict_linear, predict_xgb, time_split, tune_xgb
 
@@ -239,6 +241,11 @@ def run(cfg: Config, use_cache: bool = True) -> dict:
             plots.shap_beeswarm(values, Xs, [FEATURE_LABELS.get(c, c) for c in Xs.columns],
                                 F / "fig12_shap_beeswarm.png")
 
+            try:   # readable local authority names in the case-study charts
+                la = build_la_names(cfg)
+                set_la_names(dict(zip(la["lad"], la["la_name"])))
+            except FileNotFoundError:
+                log.warning("Local authority names not found - codes will be shown")
             # Case studies for the report and the professional questionnaire.
             cases = _pick_cases(scored, cfg.n_case_studies, rng)
             case_rows = []
@@ -268,6 +275,9 @@ def run(cfg: Config, use_cache: bool = True) -> dict:
             shutil.copy(lookup_src, cfg.models_dir / "postcode_lookup.parquet")
         else:
             lookup.to_parquet(cfg.models_dir / "postcode_lookup.parquet", index=False)
+
+    with Stage("9. Prepare dashboard data"):
+        prepare_dashboard(cfg, df)
 
     total = round(time.time() - t_start, 1)
     _write_results_md(cfg, cleaning, summary, comparison, ablation, rates, shap_groups, Stage.timings, total)

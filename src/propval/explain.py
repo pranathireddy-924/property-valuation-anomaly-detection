@@ -67,7 +67,18 @@ CODE_NAMES = {
     "duration": {"F": "Freehold", "L": "Leasehold"},
     "old_new": {"Y": "Yes", "N": "No"},
     "region": REGION_NAMES,
+    "lad": {},
+    "ruc21": {   # ONS Rural-Urban Classification 2021 (England & Wales)
+        "UN1": "Urban, near a major town/city", "UF1": "Urban, further from a major town/city",
+        "RLN1": "Larger rural, near a major town/city", "RLF1": "Larger rural, further from a major town/city",
+        "RSN1": "Smaller rural, near a major town/city", "RSF1": "Smaller rural, further from a major town/city",
+    },
 }
+
+
+def set_la_names(names: dict[str, str]) -> None:
+    """Register local authority names so explanations read 'Sheffield' not 'E08000039'."""
+    CODE_NAMES["lad"] = dict(names)
 
 
 def _display_value(feature: str, value) -> str:
@@ -80,7 +91,7 @@ def _display_value(feature: str, value) -> str:
     if feature == "imd_pct":
         n = int(round(100 * value))
         suffix = "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
-        return f"{n}{suffix} percentile (100 = least deprived)"
+        return f"{n}{suffix} percentile"
     if feature == "hpi_12m_change":
         return f"{value:+.1f}%"
     if feature == "log_n_sector":

@@ -16,7 +16,7 @@ import pandas as pd
 
 from .config import CODE_ROOT, PROPERTY_TYPE_NAMES, REGION_NAMES
 from .data_loading import add_derived_columns, normalise_postcode
-from .explain import explain_row, shap_values
+from .explain import explain_row, set_la_names, shap_values
 from .models import predict_xgb
 
 DEFAULT_MODEL_DIR = CODE_ROOT / "outputs" / "models"
@@ -35,6 +35,10 @@ class PropertyValuer:
         model_dir = Path(model_dir)
         bundle = joblib.load(model_dir / "valuer_bundle.joblib")
         lookup = pd.read_parquet(model_dir / "postcode_lookup.parquet")
+        la_file = model_dir.parent / "app_data" / "la_names.csv"
+        if la_file.exists():   # show "Sheffield" rather than "E08000039" in explanations
+            la = pd.read_csv(la_file)
+            set_la_names(dict(zip(la["lad"], la["la_name"])))
         return cls(bundle, lookup)
 
     def value(self, postcode: str, property_type: str, new_build: bool, tenure: str,
@@ -53,15 +57,24 @@ class PropertyValuer:
         }])
         geo = self.lookup.loc[[pc]].reset_index(drop=True)
         row = add_derived_columns(pd.concat([row, geo], axis=1))
-        X = self.builder.transform(row)
+        return self.evaluate_row(row, actual_price, top_n)
 
+    def evaluate_row(self, row: pd.DataFrame, actual_price: float | None = None, top_n: int = 8) -> dict:
+        """Predict, explain and (optionally) score one prepared sale - also used to explain
+        flagged sales from the test period in the dashboard."""
+        property_type = str(row.loc[row.index[0], "property_type"])
+        X = self.builder.transform(row)
         pred_log = float(predict_xgb(self.model, X)[0])
         values, base = shap_values(self.model, X)
         q_lo, q_hi = self.detector.range_quantiles_
+        r0 = row.iloc[0]
         result = {
-            "postcode": pc,
-            "region": REGION_NAMES.get(row.loc[0, "region"], row.loc[0, "region"]),
+            "postcode": r0["postcode"],
+            "pc_district": r0["pc_district"],
+            "lad": r0["lad"],
+            "region": REGION_NAMES.get(r0["region"], r0["region"]),
             "property_type": PROPERTY_TYPE_NAMES[property_type],
+            "property_type_code": property_type,
             "predicted_price": float(np.exp(pred_log)),
             "range_low": float(np.exp(pred_log + q_lo)),
             "range_high": float(np.exp(pred_log + q_hi)),

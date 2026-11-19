@@ -12,7 +12,7 @@ This repository contains the full Python pipeline and a prototype app:
 4. Runs a **feature ablation** to test whether spatial and temporal features improve accuracy.
 5. Flags **unusual transactions** where the actual price is far from the predicted price (robust z-score).
 6. Explains predictions with **SHAP**.
-7. Provides a **Streamlit prototype** for valuing a property and reviewing unusual sales.
+7. Provides a **Streamlit research dashboard**. It sets out the problem, aims, objectives and beneficiaries, explains the data and method, and presents the results for each objective. It also includes an interactive valuation tool: browse Region → Local authority → Postcode district → Postcode, or type any postcode; get an estimate, an anomaly check and a plain-English SHAP explanation.
 
 ## Folder layout
 
@@ -24,7 +24,11 @@ Pranathi Dissertation/
 │   └── uk_hpi/UK-HPI-full-file-2026-09.csv
 └── Pranathi Dissertation Code/    <- this folder
     ├── run_pipeline.py            run everything
-    ├── app.py                     Streamlit prototype
+    ├── app.py                     Streamlit research dashboard and prototype
+    ├── dashboard/                 dashboard pages (overview, data & method, valuation tool,
+    │                              performance, unusual transactions, explainability, ethics)
+    ├── prepare_dashboard.py       builds dashboard lookups (LA names, postcodes, local prices)
+    ├── analyse_questionnaire.py   summarises professional feedback (counts, % agree, chart)
     ├── value_property.py          command-line valuation of one property
     ├── src/propval/               the package (config, data_loading, features, models,
     │                              evaluation, anomaly, explain, plots, pipeline, predict)
@@ -49,7 +53,8 @@ python run_pipeline.py --quick          # 5% sample, ~2 min: checks everything w
 python run_pipeline.py                  # full England & Wales run with tuning, ablation, SHAP
 python run_pipeline.py --region E12000003   # one region only (Yorkshire and The Humber)
 python -m pytest                        # run the test suite
-streamlit run app.py                    # open the prototype in the browser
+python prepare_dashboard.py             # dashboard lookups (run automatically by the pipeline)
+streamlit run app.py                    # open the dashboard in the browser
 python analyse_questionnaire.py --template           # blank sheet for feedback answers (1-5)
 python analyse_questionnaire.py questionnaire/responses.csv  # counts, % agree, chart
 ```

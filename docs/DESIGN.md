@@ -54,7 +54,10 @@ flowchart LR
 | `explain.py` | Exact TreeSHAP from XGBoost, global and per-group importance, per-sale explanation in % | `shap_values`, `global_importance`, `explain_row` |
 | `plots.py` | All report figures | `fig01` … `fig13` |
 | `pipeline.py` | Runs the stages in order and writes the evidence and `RESULTS.md` | `run` |
-| `predict.py` | Prototype service: value and explain one property (used by the CLI and the app) | `PropertyValuer` |
+| `predict.py` | Prototype service: value and explain one property (used by the CLI and the app) | `PropertyValuer.value`, `.evaluate_row` |
+| `dashboard_data.py` | Lookups for the dashboard: LA names, postcodes with sales, district price history, flagged-sale inputs | `prepare` |
+| `questionnaire.py` | Summary analysis of professional feedback (counts, %, anonymised comments) | `analyse` |
+| `dashboard/*.py` (outside `src`) | Streamlit pages: Overview, Data & Method, Valuation Tool, Model Performance, Unusual Transactions, Explainability, Ethics & Evaluation | `render()` per page |
 
 ### Data flow and leakage control
 
@@ -75,7 +78,7 @@ flowchart LR
 | Target | log(price) | Prices are strongly right-skewed. Errors become relative (%), which suits valuation. | Raw price: dominated by very expensive homes |
 | Split | Chronological | Matches real use (value new sales with past data) and avoids mixing market periods | Random split: leaks future market conditions |
 | Main model | XGBoost (hist, native categoricals, early stopping) | Fast on millions of rows; captures non-linear location × type effects | Deep learning: unnecessary for tabular data, harder to explain |
-| Location encoding | Smoothed out-of-fold target encoding plus lat/long | Turns about 11k postcode sectors into a meaningful number without target leakage | One-hot postcodes: far too many columns |
+| Location encoding | Smoothed out-of-fold target encoding plus lat/long | Turns about 8,000 postcode sectors with sales into a meaningful number without target leakage | One-hot postcodes: far too many columns |
 | Anomaly score | Robust z-score (median/MAD) of residual, per property type | Insensitive to the outliers it is trying to find; easy to explain; threshold is meaningful | Isolation Forest on raw features: flags rare *properties*, not unusual *prices* |
 | SHAP | XGBoost `pred_contribs` (exact TreeSHAP) | Exact, fast, supports categorical splits | KernelSHAP: slow and approximate |
 | Explanation units | % effect on price, exp(φ) − 1 | Easier for property professionals than log units | Raw SHAP values |
