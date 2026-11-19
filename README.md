@@ -26,9 +26,9 @@ Main steps:
 
 All data is public and free to use under the Open Government Licence v3.0.
 
-- HM Land Registry Price Paid Data, 2022 to 2026
-- ONS Postcode Directory, August 2026
-- UK House Price Index, September 2026
+- [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads), 2022 to 2026
+- [ONS Postcode Directory](https://www.ons.gov.uk/methodology/geography/geographicalproducts/postcodeproducts), August 2026
+- [UK House Price Index](https://landregistry.data.gov.uk/app/ukhpi/), September 2026
 
 The data files are not included in this repository because they are very large. Download them and place them in a `datasets` folder next to this folder:
 

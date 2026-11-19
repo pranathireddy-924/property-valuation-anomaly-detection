@@ -27,17 +27,17 @@ def render() -> None:
                 "dataset) and explains the inputs for <b>Objective 2</b>.")
 
     st.header("Datasets")
-    text_table(pd.DataFrame([
-        {"Dataset": "HM Land Registry Price Paid Data", "Publisher": "HM Land Registry",
-         "Role": "Main dataset: every residential sale registered in England & Wales (price, date, postcode, type, tenure, new build)",
-         "Period used": "Jan 2022 - Sep 2026", "Licence": "Open Government Licence v3.0"},
-        {"Dataset": "ONS Postcode Directory (Aug 2026)", "Publisher": "Office for National Statistics",
-         "Role": "Links each postcode to local authority, neighbourhood (LSOA/MSOA), region, coordinates, rural-urban class and deprivation",
-         "Period used": "Current release", "Licence": "Open Government Licence v3.0"},
-        {"Dataset": "UK House Price Index (Sep 2026)", "Publisher": "HM Land Registry / ONS",
-         "Role": "Official monthly average prices by local authority and property type (market level over time)",
-         "Period used": "2020 - Sep 2026", "Licence": "Open Government Licence v3.0"},
-    ]))
+    ogl = "[Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)"
+    st.markdown(
+        "| Dataset | Publisher | Role | Period used | Licence |\n|---|---|---|---|---|\n"
+        "| [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) "
+        "| HM Land Registry | Main dataset: every residential sale registered in England & Wales (price, date, postcode, "
+        f"type, tenure, new build) | Jan 2022 - Sep 2026 | {ogl} |\n"
+        "| [ONS Postcode Directory (Aug 2026)](https://www.ons.gov.uk/methodology/geography/geographicalproducts/postcodeproducts) "
+        "| Office for National Statistics | Links each postcode to local authority, neighbourhood (LSOA/MSOA), region, "
+        f"coordinates, rural-urban class and deprivation | Current release | {ogl} |\n"
+        "| [UK House Price Index (Sep 2026)](https://landregistry.data.gov.uk/app/ukhpi/) | HM Land Registry / ONS "
+        f"| Official monthly average prices by local authority and property type (market level over time) | 2020 - Sep 2026 | {ogl} |")
     st.caption("Why these sources: they are official, cover every registered sale (not a sample or a survey), "
                "are free to reuse, and are updated monthly, so the approach can be repeated by a business.")
 
