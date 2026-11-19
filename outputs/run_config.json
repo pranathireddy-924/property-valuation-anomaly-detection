@@ -1,0 +1,41 @@
+{
+  "data_dir": "datasets",
+  "output_dir": "outputs",
+  "years": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "region": null,
+  "sample_frac": null,
+  "min_price": 10000,
+  "max_price": 10000000,
+  "train_end": "2024-12-31",
+  "val_end": "2025-12-31",
+  "te_smoothing": 20.0,
+  "te_folds": 5,
+  "hpi_lag_months": 2,
+  "random_state": 42,
+  "tune": true,
+  "tune_iterations": 8,
+  "tune_sample_rows": 600000,
+  "xgb_n_estimators": 4000,
+  "xgb_learning_rate": 0.05,
+  "xgb_early_stopping": 100,
+  "xgb_params": {
+    "max_depth": 8,
+    "min_child_weight": 20,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_lambda": 1.0,
+    "gamma": 0.0
+  },
+  "run_ablation": true,
+  "ablation_learning_rate": 0.1,
+  "anomaly_z_threshold": 3.0,
+  "run_shap": true,
+  "shap_sample_rows": 5000,
+  "n_case_studies": 6
+}

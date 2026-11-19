@@ -1,0 +1,24 @@
+feature,label,missing_train_%,missing_test_%
+property_type,Property type,0.0,0.0
+old_new,New build,0.0,0.0
+duration,Tenure,0.0,0.0
+sale_year,Sale year,0.0,0.0
+sale_month,Sale month,0.0,0.0
+months_since_start,Months since Jan of first year,0.0,0.0
+region,Region,0.0,0.0
+lad,Local authority,0.0,0.0
+pc_area,Postcode area,0.0,0.0
+lat,Latitude,0.0,0.0
+long,Longitude,0.0,0.0
+ruc21,Rural/urban class,0.0,0.0
+imd_pct,Deprivation percentile,0.0,0.0
+te_sector,Local price level: postcode sector,0.0,0.0
+te_district,Local price level: postcode district,0.0,0.0
+te_lsoa,Local price level: LSOA,0.0,0.0
+te_msoa,Local price level: MSOA,0.0,0.0
+te_lad,Local price level: local authority,0.0,0.0
+te_district_type,Local price level: district x type,0.0,0.0
+log_n_sector,Sales volume in sector,0.0,0.0
+hpi_type_price_log,"HPI average price (type, LA)",0.0,0.0
+hpi_avg_price_log,HPI average price (LA),0.0,0.0
+hpi_12m_change,HPI 12-month change,0.0,0.0

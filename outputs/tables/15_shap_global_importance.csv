@@ -1,0 +1,24 @@
+feature,mean_abs_shap,label,share_%
+te_district_type,0.2210966,Local price level: district x type,29.699383
+hpi_type_price_log,0.10200343,"HPI average price (type, LA)",13.7018795
+te_lsoa,0.08074031,Local price level: LSOA,10.8456545
+duration,0.073420644,Tenure,9.862421
+lad,0.042417224,Local authority,5.6978054
+imd_pct,0.0329052,Deprivation percentile,4.4200773
+te_sector,0.030127054,Local price level: postcode sector,4.0468955
+pc_area,0.02149541,Postcode area,2.8874273
+te_district,0.021057297,Local price level: postcode district,2.8285766
+property_type,0.019333092,Property type,2.5969684
+old_new,0.013388124,New build,1.798395
+lat,0.013360452,Latitude,1.7946777
+ruc21,0.013293121,Rural/urban class,1.7856334
+te_msoa,0.012742049,Local price level: MSOA,1.7116091
+log_n_sector,0.010054229,Sales volume in sector,1.3505607
+months_since_start,0.009609218,Months since Jan of first year,1.2907834
+sale_month,0.009302344,Sale month,1.2495619
+long,0.007380924,Longitude,0.99146205
+hpi_12m_change,0.0028643317,HPI 12-month change,0.38475886
+hpi_avg_price_log,0.0028303938,HPI average price (LA),0.38020012
+te_lad,0.0025602358,Local price level: local authority,0.34391043
+region,0.0013748716,Region,0.18468323
+sale_year,0.0010918766,Sale year,0.1466692

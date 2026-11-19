@@ -1,0 +1,51 @@
+22:45:04 INFO propval: === 1. Load and clean data ===
+22:45:04 INFO propval.data_loading: Reading ONS Postcode Directory ONSPD_AUG_2026_UK.csv
+22:45:34 INFO propval.data_loading: Reading pp-2022.csv
+22:45:38 INFO propval.data_loading: Reading pp-2023.csv
+22:45:41 INFO propval.data_loading: Reading pp-2024.csv
+22:45:44 INFO propval.data_loading: Reading pp-2025.csv
+22:45:47 INFO propval.data_loading: Reading pp-2026.csv
+22:46:53 INFO propval.data_loading: Reading UK HPI UK-HPI-full-file-2026-09.csv
+22:46:57 INFO propval: Standard (cat. A) sales: 3,596,766 | category B: 489,171
+22:47:00 INFO propval: --- 1. Load and clean data done in 116.1s
+22:47:00 INFO propval: === 2. Spatial and temporal feature engineering ===
+22:47:40 INFO propval: --- 2. Spatial and temporal feature engineering done in 39.6s
+22:47:40 INFO propval: === 3a. Naive local baseline ===
+22:47:40 INFO propval: --- 3a. Naive local baseline done in 0.0s
+22:47:40 INFO propval: === 3b. Linear Regression baseline ===
+22:48:02 INFO propval.models: Linear Regression fitted in 22.0s
+22:48:05 INFO propval: --- 3b. Linear Regression baseline done in 25.3s
+22:48:05 INFO propval: === 3c. XGBoost tuning and training ===
+22:50:00 INFO propval.models: XGBoost (23 features) fitted in 115.1s, best iteration 553, val RMSE(log) 0.2997
+22:50:00 INFO propval.models: Tuning 1/8: val RMSE(log) 0.2997  {'max_depth': 8, 'min_child_weight': 20, 'subsample': 0.8, 'colsample_bytree': 0.8, 'reg_lambda': 1.0, 'gamma': 0.0}
+22:50:59 INFO propval.models: XGBoost (23 features) fitted in 59.1s, best iteration 193, val RMSE(log) 0.2996
+22:50:59 INFO propval.models: Tuning 2/8: val RMSE(log) 0.2996  {'max_depth': 10, 'min_child_weight': 5, 'subsample': 0.8, 'colsample_bytree': 0.7, 'reg_lambda': 0.5, 'gamma': 0.05}
+22:52:18 INFO propval.models: XGBoost (23 features) fitted in 78.9s, best iteration 324, val RMSE(log) 0.2998
+22:52:18 INFO propval.models: Tuning 3/8: val RMSE(log) 0.2998  {'max_depth': 9, 'min_child_weight': 50, 'subsample': 0.8, 'colsample_bytree': 0.9, 'reg_lambda': 0.5, 'gamma': 0.05}
+22:54:18 INFO propval.models: XGBoost (23 features) fitted in 120.2s, best iteration 578, val RMSE(log) 0.2990
+22:54:18 INFO propval.models: Tuning 4/8: val RMSE(log) 0.2990  {'max_depth': 8, 'min_child_weight': 5, 'subsample': 0.9, 'colsample_bytree': 0.7, 'reg_lambda': 5.0, 'gamma': 0.0}
+22:56:01 INFO propval.models: XGBoost (23 features) fitted in 102.4s, best iteration 480, val RMSE(log) 0.2990
+22:56:01 INFO propval.models: Tuning 5/8: val RMSE(log) 0.2990  {'max_depth': 9, 'min_child_weight': 100, 'subsample': 1.0, 'colsample_bytree': 0.8, 'reg_lambda': 1.0, 'gamma': 0.0}
+22:57:25 INFO propval.models: XGBoost (23 features) fitted in 84.4s, best iteration 310, val RMSE(log) 0.2995
+22:57:25 INFO propval.models: Tuning 6/8: val RMSE(log) 0.2995  {'max_depth': 9, 'min_child_weight': 5, 'subsample': 0.9, 'colsample_bytree': 0.8, 'reg_lambda': 0.5, 'gamma': 0.01}
+22:59:35 INFO propval.models: XGBoost (23 features) fitted in 130.0s, best iteration 634, val RMSE(log) 0.3000
+22:59:35 INFO propval.models: Tuning 7/8: val RMSE(log) 0.3000  {'max_depth': 7, 'min_child_weight': 50, 'subsample': 0.9, 'colsample_bytree': 1.0, 'reg_lambda': 2.0, 'gamma': 0.0}
+23:00:37 INFO propval.models: XGBoost (23 features) fitted in 61.9s, best iteration 182, val RMSE(log) 0.2994
+23:00:37 INFO propval.models: Tuning 8/8: val RMSE(log) 0.2994  {'max_depth': 10, 'min_child_weight': 5, 'subsample': 0.9, 'colsample_bytree': 0.8, 'reg_lambda': 0.5, 'gamma': 0.05}
+23:23:12 INFO propval.models: XGBoost (23 features) fitted in 1355.2s, best iteration 3999, val RMSE(log) 0.2889
+23:24:49 INFO propval: --- 3c. XGBoost tuning and training done in 2203.9s
+23:24:49 INFO propval: === 4. Evaluation ===
+23:24:55 INFO propval: --- 4. Evaluation done in 5.9s
+23:24:55 INFO propval: === 5. Feature ablation (hypothesis test) ===
+23:25:14 INFO propval.models: XGBoost (3 features) fitted in 19.3s, best iteration 37, val RMSE(log) 0.5660
+23:26:00 INFO propval.models: XGBoost (6 features) fitted in 46.2s, best iteration 116, val RMSE(log) 0.5662
+23:46:16 INFO propval.models: XGBoost (17 features) fitted in 1214.4s, best iteration 3999, val RMSE(log) 0.2868
+00:00:49 INFO propval.models: XGBoost (23 features) fitted in 842.2s, best iteration 2457, val RMSE(log) 0.2898
+00:01:09 INFO propval: --- 5. Feature ablation (hypothesis test) done in 2173.8s
+00:01:09 INFO propval: === 6. Price anomaly detection ===
+00:01:19 INFO propval: --- 6. Price anomaly detection done in 10.1s
+00:01:19 INFO propval: === 7. SHAP explanations ===
+00:04:00 INFO propval: --- 7. SHAP explanations done in 161.6s
+00:04:00 INFO propval: === 8. Save prototype model ===
+00:04:09 INFO propval: --- 8. Save prototype model done in 8.9s
+00:04:09 INFO propval: Pipeline finished in 79.1 min. Outputs in outputs

@@ -1,0 +1,8 @@
+step,rows_before,rows_removed,rows_after,reason
+Raw records,4321643,0,4321643,Price Paid yearly files 2022-2026
+Record status,4321643,0,4321643,Keep additions only (drop changes/deletions)
+Duplicates,4321643,0,4321643,Remove duplicated transaction IDs
+Missing postcode,4321643,11094,4310549,Postcode needed for spatial features
+Property type 'Other',4310549,223662,4086887,Type O is non-residential / mixed use and not comparable
+Price range,4086887,801,4086086,"Keep £10,000 - £10,000,000 (sanity limits)"
+Postcode match (ONSPD),4086086,149,4085937,Remove sales whose postcode is not in ONSPD (Risk R2)

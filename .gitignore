@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# large or regenerable outputs (re-create with: python run_pipeline.py)
+outputs/cache/
+outputs/models/
+outputs_quick/
+full_run_console.log
+
+# raw data lives in ../datasets and is not committed (Open Government Licence, re-downloadable)
+datasets/
+*.csv.gz
+
+# raw questionnaire answers stay private (only anonymised summaries are shared)
+questionnaire/

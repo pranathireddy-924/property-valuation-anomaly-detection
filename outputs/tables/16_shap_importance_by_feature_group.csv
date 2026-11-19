@@ -1,0 +1,5 @@
+group,mean_abs_shap,share_%
+Spatial,0.510605,68.588356
+Market index (UK HPI),0.10769816,14.466839
+Property,0.10614186,14.257785
+Temporal,0.020003438,2.6870146
