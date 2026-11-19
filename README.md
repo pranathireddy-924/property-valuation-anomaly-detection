@@ -1,44 +1,63 @@
-# AI-Driven Property Valuation and Anomaly Detection Using Spatial and Temporal Housing Market Data
+# Property Valuation and Anomaly Detection
 
-MSc Data Science and AI dissertation code: Pranathi Nooka (C5055924), Sheffield Hallam University.
+MSc Data Science and AI dissertation project, Sheffield Hallam University.
+Pranathi Nooka (C5055924).
 
-**Research question:** How accurately can an explainable AI model estimate property transaction prices and identify unusual sale prices using spatial and temporal housing market data?
+Full title: *AI-Driven Property Valuation and Anomaly Detection Using Spatial and Temporal Housing Market Data*
 
-This repository contains the full Python pipeline and a prototype app:
+## What this project does
 
-1. Cleans HM Land Registry Price Paid Data (England & Wales, 2022–2026) and links each sale to ONS geography.
-2. Builds spatial and temporal features, including local price patterns and the UK House Price Index.
-3. Trains a **Linear Regression** baseline and an **XGBoost** model on a time-based split, then compares them with MAE, RMSE and R².
-4. Runs a **feature ablation** to test whether spatial and temporal features improve accuracy.
-5. Flags **unusual transactions** where the actual price is far from the predicted price (robust z-score).
-6. Explains predictions with **SHAP**.
-7. Provides a **Streamlit research dashboard**. It sets out the problem, aims, objectives and beneficiaries, explains the data and method, and presents the results for each objective. It also includes an interactive valuation tool: browse Region → Local authority → Postcode district → Postcode, or type any postcode; get an estimate, an anomaly check and a plain-English SHAP explanation.
+The code predicts the sale price of a house or flat in England and Wales. It then compares the predicted price with the real sale price. If the real price is much higher or much lower than expected, the sale is marked as unusual so that a person can check it.
 
-## Folder layout
+It also shows the reasons behind each prediction using SHAP.
+
+Main steps:
+
+1. Clean the HM Land Registry sales data (2022 to 2026) and add location details from the ONS Postcode Directory.
+2. Create features such as postcode area, property type, sale month and local average prices.
+3. Train two models, Linear Regression and XGBoost, and compare them using MAE, RMSE and R².
+4. Check if location and time features improve the results.
+5. Give each sale an anomaly score and mark the unusual ones.
+6. Explain the predictions with SHAP.
+7. Show everything in a Streamlit dashboard, where you can also try your own postcode and price.
+
+## Data used
+
+All data is public and free to use under the Open Government Licence v3.0.
+
+- HM Land Registry Price Paid Data, 2022 to 2026
+- ONS Postcode Directory, August 2026
+- UK House Price Index, September 2026
+
+The data files are not included in this repository because they are very large. Download them and place them in a `datasets` folder next to this folder:
 
 ```
 Pranathi Dissertation/
-├── datasets/                      raw data (see datasets/README.md for sources and licence)
+├── datasets/
 │   ├── price_paid/pp-2022.csv ... pp-2026.csv
 │   ├── onspd/Data/ONSPD_AUG_2026_UK.csv
 │   └── uk_hpi/UK-HPI-full-file-2026-09.csv
-└── Pranathi Dissertation Code/    <- this folder
-    ├── run_pipeline.py            run everything
-    ├── app.py                     Streamlit research dashboard and prototype
-    ├── dashboard/                 dashboard pages (overview, data & method, valuation tool,
-    │                              performance, unusual transactions, explainability, ethics)
-    ├── prepare_dashboard.py       builds dashboard lookups (LA names, postcodes, local prices)
-    ├── analyse_questionnaire.py   summarises professional feedback (counts, % agree, chart)
-    ├── value_property.py          command-line valuation of one property
-    ├── src/propval/               the package (config, data_loading, features, models,
-    │                              evaluation, anomaly, explain, plots, pipeline, predict)
-    ├── tests/                     30 unit / integration / system tests (pytest)
-    ├── docs/DESIGN.md             architecture, design decisions, test plan
-    ├── docs/test_results.txt      latest test run
-    └── outputs/                   generated tables, figures, RESULTS.md, trained model
+└── Pranathi Dissertation Code/   (this folder)
 ```
 
-## Setup (Windows, Python 3.12+)
+## Folders and files
+
+| Name | What it is |
+|---|---|
+| `run_pipeline.py` | Runs all the steps |
+| `app.py` | Starts the dashboard |
+| `dashboard/` | The dashboard pages |
+| `value_property.py` | Values one property from the command line |
+| `prepare_dashboard.py` | Builds the lookup files the dashboard needs |
+| `analyse_questionnaire.py` | Summarises the questionnaire answers |
+| `src/propval/` | The main code |
+| `tests/` | 30 tests |
+| `docs/` | Design notes and test results |
+| `outputs/` | Tables, charts and results created by the pipeline |
+
+## How to set up
+
+You need Python 3.12 or newer.
 
 ```bash
 python -m venv .venv
@@ -46,62 +65,45 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Running
+## How to run
 
 ```bash
-python run_pipeline.py --quick          # 5% sample, ~2 min: checks everything works
-python run_pipeline.py                  # full England & Wales run with tuning, ablation, SHAP
-python run_pipeline.py --region E12000003   # one region only (Yorkshire and The Humber)
-python -m pytest                        # run the test suite
-python prepare_dashboard.py             # dashboard lookups (run automatically by the pipeline)
-streamlit run app.py                    # open the dashboard in the browser
-python analyse_questionnaire.py --template           # blank sheet for feedback answers (1-5)
-python analyse_questionnaire.py questionnaire/responses.csv  # counts, % agree, chart
+python run_pipeline.py --quick     # quick test on a small sample (about 2 minutes)
+python run_pipeline.py             # full run on all of England and Wales
+python -m pytest                   # run the tests
+streamlit run app.py               # open the dashboard
 ```
 
-Value one property from the command line:
+Value one property:
 
 ```bash
 python value_property.py --postcode "S1 2BJ" --type F --tenure L --date 2026-06-15 --price 180000
 ```
 
-The first full run reads the raw CSVs, which takes about 1–2 minutes. It caches a joined Parquet file in `outputs/cache/`, so later runs start faster. Use `--no-cache` to rebuild it. All settings (years, split dates, thresholds, model parameters) are in `src/propval/config.py`.
+Questionnaire:
 
-## Method summary
+```bash
+python analyse_questionnaire.py --template                     # make a blank answer sheet
+python analyse_questionnaire.py questionnaire/responses.csv    # summarise the answers
+```
 
-| Step | Detail |
-|---|---|
-| Data | Price Paid standard (category A) sales of houses and flats, £10k–£10m, joined to the ONS Postcode Directory |
-| Split | Train 2022–2024 · validation 2025 · test Jan–Sep 2026 (chronological) |
-| Target | log(price); errors reported in £ and % |
-| Property features | Property type, new build, tenure |
-| Temporal features | Sale year, sale month, months since start |
-| Spatial features | Region, local authority, postcode area, latitude/longitude, rural-urban class, deprivation percentile, local price levels (out-of-fold smoothed target encoding for postcode sector, district, LSOA, MSOA, LA, district × type), sector sales volume |
-| Market features | UK HPI price for the local authority and property type, plus 12-month change (lagged 2 months) |
-| Models | Naive local median; Linear Regression; XGBoost (tuned by random search on the validation period, early stopping) |
-| Anomaly score | Robust z = (residual − median) / (1.4826 × MAD), per property type, calibrated on validation; \|z\| > 3 = unusual |
-| Validation of anomalies | 20 injected anomalies in tests; real category B sales (repossessions etc.) should be flagged more often |
-| Explainability | Exact TreeSHAP: global importance, beeswarm, importance by feature group, 6 case studies |
+All settings are in `src/propval/config.py`.
 
-## Outputs (`outputs/`)
+## How the data is split
 
-| File | Content |
-|---|---|
-| `RESULTS.md` | Key results in one page (auto-generated) |
-| `tables/01_cleaning_report.csv` | Rows removed by each cleaning rule |
-| `tables/02_data_summary.csv` | Sales, dates and price mix per split |
-| `tables/05_model_comparison.csv` | MAE, RMSE, R², MdAPE, % within 10/20%, for validation and test |
-| `tables/06_`, `07_` | XGBoost error by property type and by region |
-| `tables/09_feature_ablation.csv` | Hypothesis test: property → + temporal → + spatial → full |
-| `tables/11_unusual_transactions_test.csv` | Flagged sales (postcode district only, no addresses) |
-| `tables/14_anomaly_check_category_b.csv` | Flag rate for standard vs category B sales |
-| `tables/15_`–`17_` | SHAP importance, by group, case-study explanations |
-| `figures/fig01`–`fig13` | All charts for the report and presentation |
-| `models/` | Trained model bundle used by the app |
+- Training: 2022 to 2024
+- Validation: 2025
+- Testing: January to September 2026
 
-## Ethics and limitations
+The models are tested only on sales they have never seen.
 
-- Data is public and licensed under the Open Government Licence v3.0. Address fields are never loaded, and outputs show only the postcode district.
-- A flagged sale is an **unusual transaction for human review**. It is not evidence of fraud or an incorrect price.
-- Price Paid has no floor area, bedroom count or condition. The model estimates the expected price from location, type, tenure, timing and market level only, and this limits accuracy for individual homes.
-- 2026 contains sales registered up to September 2026. Recent months are incomplete because of registration delays.
+## Results
+
+The main results are saved in `outputs/RESULTS.md`. Tables are in `outputs/tables/` and charts are in `outputs/figures/`.
+
+## Ethics and limits
+
+- No addresses are used. Results show only the postcode district.
+- An unusual sale does not mean fraud or a wrong price. It only means the price is very different from similar sales and should be checked by a person.
+- The data has no floor area, number of bedrooms or condition, so the predictions for single homes are not exact.
+- Sales from late 2026 may be missing because they take time to be registered.

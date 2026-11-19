@@ -1,6 +1,6 @@
-# Design: AI-Driven Property Valuation and Anomaly Detection
+# Design notes
 
-This document covers the high- and low-level design, the main design decisions, how the code traces to the research objectives, and the test plan. It supports the *Project Design* and *Implementation* chapters of the dissertation.
+This file explains how the code is built, why some choices were made, which code covers each objective, and how it was tested.
 
 ## 1. Requirements
 
