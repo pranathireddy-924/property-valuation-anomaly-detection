@@ -87,8 +87,6 @@ def render() -> None:
                      f"{g.get('Property', 0):.0f}%.",
                      "Explainability"))
     text_table(pd.DataFrame({"Objective": [x[0] for x in rows], "Outcome": [x[1] for x in rows], "See page": [x[2] for x in rows]}))
-    st.caption("Professional evaluation (a short questionnaire with 5-8 property professionals) is in progress; "
-               "results will appear on the Ethics & Evaluation page.")
 
     st.header("4. Who benefits and how")
     b = st.columns(3)
@@ -106,7 +104,7 @@ def render() -> None:
                  "valuers can prioritise their manual review.")
     callout("<b>Decision support, not a decision.</b> An 'unusual' flag means the price differs strongly from "
             "similar sales. It does <b>not</b> indicate fraud or an incorrect price. Property condition, size and "
-            "sale circumstances are not in the data and must be checked by a professional.", warn=True)
+            "sale circumstances are not in the data.", warn=True)
 
     st.header("5. How to use this dashboard")
     st.markdown(
@@ -116,4 +114,5 @@ def render() -> None:
         "| **Model Performance** | Objective 3: XGBoost vs Linear Regression, plus the feature test for Objective 2 |\n"
         "| **Unusual Transactions** | Objective 4: how sales are flagged, the evidence the method works, and every flagged 2026 sale with its explanation |\n"
         "| **Explainability** | Objective 5: what drives the model overall and worked case studies |\n"
-        "| **Ethics & Evaluation** | Ethical safeguards, limitations, professional feedback and references |")
+        "| **Ethics & Limitations** | Ethical safeguards, limitations, data attribution and references |\n"
+        "| **Run Pipeline** | Run the whole pipeline again on new or updated data, from the browser |")

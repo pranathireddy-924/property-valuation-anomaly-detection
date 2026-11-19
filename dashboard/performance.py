@@ -1,10 +1,8 @@
 """Model Performance: Objective 3 (XGBoost vs Linear Regression) and Objective 2 (feature test)."""
-import json
-
 import pandas as pd
 import streamlit as st
 
-from dashboard.common import text_table, TABLES, callout, figure, gbp, page_header, table
+from dashboard.common import text_table, callout, figure, gbp, page_header, table
 
 METRIC_HELP = pd.DataFrame([
     ("MAE", "Mean absolute error", "Average size of the error in pounds. Lower is better."),
@@ -102,14 +100,3 @@ def render() -> None:
                 "test period. The hypothesis is therefore <b>supported for spatial features but not for temporal "
                 "features</b> in this period.")
         figure("fig08_feature_ablation.png", "Effect of adding feature groups on XGBoost accuracy.")
-
-    p = TABLES / "04_xgb_best_params.json"
-    if p.exists():
-        with st.expander("Model settings (hyper-parameter tuning)"):
-            tun = table("04_xgb_tuning_results.csv")
-            rng = (f" (validation RMSE on log price {tun['val_rmse_log'].min():.4f}-{tun['val_rmse_log'].max():.4f})"
-                   if tun is not None else "")
-            st.write(f"{len(tun) if tun is not None else 'Several'} candidate settings were compared on the 2025 "
-                     f"validation period by random search. Differences were small{rng}, which indicates that accuracy "
-                     "is limited by the available information rather than by model tuning. Chosen settings:")
-            st.json(json.loads(p.read_text()))

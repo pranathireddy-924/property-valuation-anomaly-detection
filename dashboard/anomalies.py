@@ -127,6 +127,3 @@ def render() -> None:
              f"**{res['anomaly_score']:+.1f}**. The factors behind the *expected* price were:")
     st.altair_chart(explanation_chart(res["explanation"]), width="stretch")
     text_table(explanation_table(res["explanation"], res["property_type"]))
-    callout("Possible legitimate reasons for a large difference include unusual size or land, renovation or "
-            "disrepair, a sale between connected parties, a portfolio or auction sale, or a data-entry issue. "
-            "The model cannot tell these apart, which is why flagged sales go to a person for review.", warn=True)

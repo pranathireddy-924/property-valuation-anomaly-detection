@@ -20,6 +20,7 @@ Main steps:
 5. Give each sale an anomaly score and mark the unusual ones.
 6. Explain the predictions with SHAP.
 7. Show everything in a Streamlit dashboard, where you can also try your own postcode and price.
+8. Run the whole pipeline again from the dashboard (Run Pipeline page), for example with new data, one region or other dates.
 
 ## Data used
 
@@ -51,7 +52,7 @@ Pranathi Dissertation/
 | `prepare_dashboard.py` | Builds the lookup files the dashboard needs |
 | `analyse_questionnaire.py` | Summarises the questionnaire answers |
 | `src/propval/` | The main code |
-| `tests/` | 30 tests |
+| `tests/` | 34 tests |
 | `docs/` | Design notes and test results |
 | `outputs/` | Tables, charts and results created by the pipeline |
 

@@ -31,6 +31,7 @@ def main() -> None:
     p.add_argument("--no-ablation", action="store_true", help="Skip the feature ablation study")
     p.add_argument("--no-shap", action="store_true", help="Skip SHAP explanations")
     p.add_argument("--threshold", type=float, help="Anomaly |z| threshold (default 3)")
+    p.add_argument("--learning-rate", type=float, help="XGBoost learning rate (default 0.05; 0.1 is faster)")
     p.add_argument("--data-dir", help="Folder holding price_paid/, onspd/ and uk_hpi/")
     p.add_argument("--output-dir", help="Where to write outputs")
     p.add_argument("--no-cache", action="store_true", help="Ignore cached Parquet files")
@@ -57,6 +58,8 @@ def main() -> None:
         cfg.run_shap = False
     if a.threshold:
         cfg.anomaly_z_threshold = a.threshold
+    if a.learning_rate:
+        cfg.xgb_learning_rate = a.learning_rate
     if a.data_dir:
         cfg.data_dir = Path(a.data_dir)
     if a.output_dir:

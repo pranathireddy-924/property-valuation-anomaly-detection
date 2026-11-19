@@ -57,8 +57,7 @@ def render() -> None:
            "raise the estimate.", width=820)
 
     st.header("Worked case studies")
-    st.write("Six 2026 sales (two unusually high, two unusually low, two normal) were selected at random. They "
-             "will also be used in the professional questionnaire.")
+    st.write("Six 2026 sales (two unusually high, two unusually low, two normal) were selected at random.")
     cases = table("17_case_study_explanations.csv")
     if cases is None:
         return

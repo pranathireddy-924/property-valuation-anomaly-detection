@@ -1,9 +1,8 @@
-"""Ethics, limitations, professional evaluation and references."""
+"""Ethics, limitations, data attribution and references."""
 import pandas as pd
 import streamlit as st
 
-from dashboard.common import text_table, OUT, callout, page_header
-from propval.questionnaire import QUESTIONS
+from dashboard.common import text_table, OUT, page_header
 
 REFERENCES = [
     "Baur, K., Rosenfelder, M., & Lutz, B. (2023). Automated real estate valuation with machine learning models using property descriptions. *Expert Systems with Applications, 213*, 119147. https://doi.org/10.1016/j.eswa.2022.119147",
@@ -21,9 +20,9 @@ REFERENCES = [
 
 
 def render() -> None:
-    page_header("Ethics & Evaluation",
+    page_header("Ethics & Limitations",
                 "How the project protects people and presents results responsibly, what its limitations are, "
-                "how professionals are evaluating it, and the sources it builds on.")
+                "and the sources it builds on.")
 
     st.header("Ethical safeguards")
     st.markdown(
@@ -32,9 +31,7 @@ def render() -> None:
         "- **Privacy by design.** House numbers, flat numbers and street names are never loaded. Results show only "
         "the postcode district (e.g. S10), never an individual address.\n"
         "- **Careful language.** Flagged sales are described as *unusual transactions*, never as fraud or incorrect prices.\n"
-        "- **Human in the loop.** The tool supports professional judgement and does not replace it.\n"
-        "- **Participants.** Feedback comes from 5-8 adult property professionals who give informed consent. Responses "
-        "are coded P1, P2 and so on, with no personal or company names.")
+        "- **Human in the loop.** The tool supports professional judgement and does not replace it.")
 
     st.header("Limitations")
     st.markdown(
@@ -46,14 +43,9 @@ def render() -> None:
         "- **Registration delay.** Recent months are incomplete, because sales appear in the data some weeks after completion.\n"
         "- **Anomalies are statistical.** A high score shows that a price is unusual compared with similar sales, not why it is unusual.\n"
         "- **Scope.** England and Wales only. Standard residential sales (houses and flats) between £10,000 and £10 million.")
-    with st.expander("Future work"):
-        st.markdown("- Add property size and energy data (e.g. Energy Performance Certificates) to reduce error.\n"
-                    "- Use spatial models of neighbouring sales (e.g. spatial lag features or graph models).\n"
-                    "- Calibrate the anomaly threshold with expert-labelled cases from the questionnaire.")
-
-    st.header("Professional evaluation")
     summary = OUT / "questionnaire" / "18_questionnaire_summary.csv"
-    if summary.exists():
+    if summary.exists():   # shown only once questionnaire results have been analysed
+        st.header("Professional evaluation")
         s = pd.read_csv(summary)
         text_table(pd.DataFrame({"Statement": s["statement"], "Responses": s["n"],
                                    "Agree or strongly agree": s["agree_%"].map("{:.0f}%".format),
@@ -65,12 +57,6 @@ def render() -> None:
         if com.exists():
             with st.expander("Anonymised comments"):
                 text_table(pd.read_csv(com))
-    else:
-        callout("<b>Status: in progress.</b> A short questionnaire is being completed by 5-8 property professionals "
-                "(estate agents, analysts, mortgage advisers and valuers). They review this dashboard and the case "
-                "studies and rate the statements below from 1 (strongly disagree) to 5 (strongly agree). Results will "
-                "appear here once collected.")
-        text_table(pd.DataFrame({"#": range(1, len(QUESTIONS) + 1), "Statement": list(QUESTIONS.values())}))
 
     st.header("Data attribution")
     st.caption("Contains HM Land Registry data © Crown copyright and database right 2026. This data is licensed "

@@ -57,7 +57,8 @@ flowchart LR
 | `predict.py` | Prototype service: value and explain one property (used by the CLI and the app) | `PropertyValuer.value`, `.evaluate_row` |
 | `dashboard_data.py` | Lookups for the dashboard: LA names, postcodes with sales, district price history, flagged-sale inputs | `prepare` |
 | `questionnaire.py` | Summary analysis of professional feedback (counts, %, anonymised comments) | `analyse` |
-| `dashboard/*.py` (outside `src`) | Streamlit pages: Overview, Data & Method, Valuation Tool, Model Performance, Unusual Transactions, Explainability, Ethics & Evaluation | `render()` per page |
+| `dashboard/*.py` (outside `src`) | Streamlit pages: Overview, Data & Method, Valuation Tool, Model Performance, Unusual Transactions, Explainability, Ethics & Limitations, Run Pipeline | `render()` per page |
+| `runner.py` | Helpers for running the pipeline from the dashboard: check the data folder, build the command, read progress | `check_data_dir`, `build_command`, `read_progress` |
 
 ### Data flow and leakage control
 
@@ -124,6 +125,10 @@ Automated tests use `pytest`. Run them with `python -m pytest`. Unit tests use s
 | UT-20 | Unit | Questionnaire answers summarised as counts and percentages | Agree 75%, disagree 25% | `test_ut20_counts_and_percentages` |
 | UT-21 | Unit | Emails, phone numbers and postcodes removed from comments | Redacted | `test_ut21_comments_are_anonymised` |
 | UT-22 | Unit | Questionnaire outputs use P1, P2 codes, never names | No names in output | `test_ut22_analysis_outputs_use_codes_not_names` |
+| UT-23 | Unit | Run Pipeline page finds the data files and years in a data folder | Years 2022, 2023 found; missing file reported | `test_ut23_check_data_dir_finds_files` |
+| UT-24 | Unit | Uploaded files are saved in the right sub-folder | pp-2027.csv → price_paid | `test_ut24_uploaded_files_go_to_the_right_folder` |
+| UT-25 | Unit | Bad settings are rejected; good settings become the right command | Errors listed; flags present | `test_ut25_settings_are_validated_and_turned_into_a_command` |
+| UT-26 | Unit | Progress is read from the pipeline log | Done / current / failed stages | `test_ut26_progress_is_read_from_the_log` |
 | IT-01 | Integration | Full pipeline writes all tables, figures and the model bundle | Files exist | `test_it01_pipeline_writes_all_evidence` |
 | IT-02 | Integration | Postcode not in ONSPD is removed and reported | 1 row removed | `test_it02_cleaning_report_matches_injected_bad_rows` |
 | IT-03 | Integration | Exported unusual transactions contain no address or full postcode | No such columns | `test_it03_unusual_transactions_file_has_no_addresses` |

@@ -7,3 +7,6 @@ textColor = "#1a202c"
 
 [browser]
 gatherUsageStats = false
+
+[server]
+maxUploadSize = 500

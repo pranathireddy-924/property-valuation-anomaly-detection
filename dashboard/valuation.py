@@ -179,14 +179,14 @@ def render() -> None:
                 "you can compare areas, property types and prices.",
                 "the project deliverable; Objectives 3, 4 and 5 applied to a single property")
 
-    with st.expander("Not sure where to start? Load an example", expanded=False):
+    with st.expander("Try an example", expanded=False):
         cols = st.columns(len(_examples()) or 1)
         for col, ex in zip(cols, _examples()):
             col.button(ex["desc"], on_click=_load_example, args=(ex,), width="stretch",
                        help=f"{ex['postcode']} ({ex['la']})")
 
     st.subheader("Step 1. Location")
-    st.button("🎲 Pick a random postcode", on_click=_random_postcode,
+    st.button("Pick a random postcode", on_click=_random_postcode,
               help="Chooses a real postcode with recorded sales anywhere in England & Wales")
     pc = _choose_location()
 
