@@ -47,6 +47,7 @@ Pranathi Dissertation/
 |---|---|
 | `run_pipeline.py` | Runs all the steps |
 | `app.py` | Starts the dashboard |
+| `setup.bat`, `start_dashboard.bat` | Set up and start the dashboard on Windows by double-clicking |
 | `dashboard/` | The dashboard pages |
 | `value_property.py` | Values one property from the command line |
 | `prepare_dashboard.py` | Builds the lookup files the dashboard needs |
@@ -59,6 +60,13 @@ Pranathi Dissertation/
 ## How to set up
 
 You need Python 3.12 or newer.
+
+On Windows the easy way is:
+
+1. Double-click `setup.bat` (only once, it installs everything).
+2. Double-click `start_dashboard.bat` to open the dashboard.
+
+Or do it by hand:
 
 ```bash
 python -m venv .venv
