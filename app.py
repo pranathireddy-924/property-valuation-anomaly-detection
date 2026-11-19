@@ -26,10 +26,10 @@ def _wrap(fn):
     def page():
         reset_figures()
         if fn not in (overview.render, pipeline_runner.render) and not model_ready():
-            st.error("No trained model found. Use the Run Pipeline page, or run `python run_pipeline.py`.")
+            st.error("No trained model found yet. Use the Run Pipeline page to build it.")
             st.stop()
         if fn in (valuation.render,) and not app_data_ready():
-            st.error("Dashboard lookup files are missing. Run `python prepare_dashboard.py`.")
+            st.error("The dashboard data is missing. Use the Run Pipeline page to build it.")
             st.stop()
         fn()
     page.__name__ = fn.__module__.split(".")[-1]

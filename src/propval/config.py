@@ -12,6 +12,17 @@ from pathlib import Path
 CODE_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DATA_DIR = CODE_ROOT.parent / "datasets"
 
+
+def display_path(path) -> str:
+    """Path relative to the project folder, so logs and saved settings never show a user's own folders."""
+    path = Path(path).resolve()
+    for base in (CODE_ROOT, CODE_ROOT.parent):
+        try:
+            return path.relative_to(base).as_posix() or "."
+        except ValueError:
+            continue
+    return path.name
+
 # Column layout of the (header-less) HM Land Registry Price Paid CSV files.
 PRICE_PAID_COLUMNS = [
     "transaction_id", "price", "date_of_transfer", "postcode", "property_type",
@@ -161,6 +172,6 @@ class Config:
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["data_dir"] = str(self.data_dir)
-        d["output_dir"] = str(self.output_dir)
+        d["data_dir"] = display_path(self.data_dir)
+        d["output_dir"] = display_path(self.output_dir)
         return d

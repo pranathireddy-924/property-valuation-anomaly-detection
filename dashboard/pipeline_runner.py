@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -12,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from dashboard.common import OUT, ROOT, callout, gbp, page_header, text_table
+from dashboard.common import OUT, ROOT, gbp, page_header, text_table
 from propval.config import DEFAULT_DATA_DIR, REGION_NAMES
 from propval.runner import STAGES, RunSettings, build_command, check_data_dir, read_progress, target_folder, validate
 
@@ -50,50 +51,40 @@ def _free_gb(path: Path) -> float:
 # --------------------------------------------------------------------------- step 1: data
 def _data_section() -> tuple[Path, object]:
     st.header("Step 1. Data")
-    st.write("The pipeline needs three files from official sources. Put them in a data folder with this layout. "
-             "To use newer data (for example a new year of sales or a newer postcode directory), add the files "
-             "here; the newest postcode directory and House Price Index file are picked automatically.")
-    text_table(pd.DataFrame([
-        ("price_paid/pp-YYYY.csv", "HM Land Registry Price Paid Data, one file per year",
-         "gov.uk/government/statistical-data-sets/price-paid-data-downloads"),
-        ("onspd/Data/ONSPD_<MONTH>_<YEAR>_UK.csv", "ONS Postcode Directory (postcode to area lookup)",
-         "ons.gov.uk/methodology/geography/geographicalproducts/postcodeproducts"),
-        ("uk_hpi/UK-HPI-full-file-<YYYY-MM>.csv", "UK House Price Index full file",
-         "gov.uk/government/collections/uk-house-price-index-reports"),
-    ], columns=["File (inside the data folder)", "What it is", "Download from"]))
-
-    data_dir = Path(st.text_input("Data folder", str(DEFAULT_DATA_DIR),
-                                  help="Folder that contains price_paid, onspd and uk_hpi"))
+    folder = st.text_input("Data folder", placeholder=r"e.g. D:\Data\housing",
+                           help="Full path of the folder that holds the price_paid, onspd and uk_hpi folders. "
+                                "Leave empty to use the datasets folder that comes with the project.")
+    data_dir = Path(folder.strip().strip('"')) if folder.strip() else DEFAULT_DATA_DIR
     check = check_data_dir(data_dir)
-    rows = [
-        ("Price Paid", ", ".join(map(str, check.price_paid_years)) if check.price_paid_years else "Not found"),
-        ("Postcode Directory", check.onspd_file.name if check.onspd_file else "Not found"),
-        ("House Price Index", check.hpi_file.name if check.hpi_file else "Not found"),
-    ]
-    text_table(pd.DataFrame(rows, columns=["Dataset", "Found in the data folder"]))
-    if not check.ready:
-        callout("Some files are missing. Add them to the data folder (or upload them below) before running.", warn=True)
+    text_table(pd.DataFrame([
+        ("HM Land Registry Price Paid Data", "price_paid/pp-YYYY.csv (one file per year)",
+         ", ".join(map(str, check.price_paid_years)) if check.price_paid_years else "Not found"),
+        ("ONS Postcode Directory", "onspd/Data/ONSPD_<MONTH>_<YEAR>_UK.csv",
+         check.onspd_file.name if check.onspd_file else "Not found"),
+        ("UK House Price Index", "uk_hpi/UK-HPI-full-file-<YYYY-MM>.csv",
+         check.hpi_file.name if check.hpi_file else "Not found"),
+    ], columns=["Dataset", "Expected file", "Found"]))
+    st.caption("When there is more than one Postcode Directory or House Price Index file, the newest is used.")
 
-    with st.expander("Upload new data files"):
-        st.write("Upload Price Paid files (pp-YYYY.csv) or a House Price Index full file. They are saved into the "
-                 "right sub-folder automatically. The Postcode Directory is too large to upload here (about 1.5 GB): "
-                 "copy it into onspd/Data yourself.")
-        files = st.file_uploader("Data files", type="csv", accept_multiple_files=True)
-        if files and st.button("Save uploaded files"):
+    with st.expander("Add new data files"):
+        files = st.file_uploader("Price Paid (pp-YYYY.csv) or House Price Index files", type="csv",
+                                 accept_multiple_files=True,
+                                 help="The Postcode Directory is too large to upload (about 1.5 GB). "
+                                      "Copy it into onspd/Data instead.")
+        if files and st.button("Save files"):
             for f in files:
-                folder = target_folder(data_dir, f.name)
-                if folder is None:
-                    st.error(f"{f.name}: name not recognised. Expected pp-YYYY.csv or UK-HPI-full-file-YYYY-MM.csv.")
+                target = target_folder(data_dir, f.name)
+                if target is None:
+                    st.error(f"{f.name}: file name not recognised.")
                     continue
-                folder.mkdir(parents=True, exist_ok=True)
-                (folder / f.name).write_bytes(f.getbuffer())
-                st.success(f"Saved {f.name} to {folder}")
+                target.mkdir(parents=True, exist_ok=True)
+                (target / f.name).write_bytes(f.getbuffer())
             st.rerun()
     return data_dir, check
 
 
 # --------------------------------------------------------------------------- step 2: settings
-def _settings_section(data_dir: Path, check) -> RunSettings | None:
+def _settings_section(data_dir: Path, check) -> RunSettings:
     st.header("Step 2. Settings")
     years_found = check.price_paid_years or [2022, 2023, 2024, 2025, 2026]
     c = st.columns(2)
@@ -127,21 +118,16 @@ def _settings_section(data_dir: Path, check) -> RunSettings | None:
         ablation = b[1].checkbox("Feature ablation test", True)
         shap = b[2].checkbox("SHAP explanations", True)
 
-    st.header("Step 3. Where to save the results")
-    target = st.radio("Results folder", ["New folder (keeps the current dashboard results)",
-                                         "Replace the dashboard results"],
-                      help="With a new folder you can look at the results first, then decide to use them.")
-    if target.startswith("New"):
-        output_dir = RUNS_DIR / f"run_{datetime.now():%Y%m%d_%H%M}"
-    else:
-        output_dir = OUT
-    st.caption(f"Results will be saved in: `{output_dir}`")
+    st.header("Step 3. Results")
+    target = st.radio("Where to save the results", ["Save in a new folder (keeps the current dashboard results)",
+                                                    "Replace the dashboard results"])
+    output_dir = RUNS_DIR / f"run_{datetime.now():%Y%m%d_%H%M}" if target.startswith("Save") else OUT
 
-    s = RunSettings(data_dir=data_dir, output_dir=output_dir, years=sorted(years),
-                    train_end=f"{train_end:%Y-%m-%d}", val_end=f"{val_end:%Y-%m-%d}", region=region,
-                    sample_frac=sample_pct / 100 if sample_pct < 100 else None, tune=tune, ablation=ablation,
-                    shap=shap, threshold=float(threshold), learning_rate=0.1 if quick else None, use_cache=use_cache)
-    return s
+    return RunSettings(data_dir=data_dir, output_dir=output_dir, years=sorted(years),
+                       train_end=f"{train_end:%Y-%m-%d}", val_end=f"{val_end:%Y-%m-%d}", region=region,
+                       sample_frac=sample_pct / 100 if sample_pct < 100 else None, tune=tune, ablation=ablation,
+                       shap=shap, threshold=float(threshold), learning_rate=0.1 if quick else None,
+                       use_cache=use_cache)
 
 
 # --------------------------------------------------------------------------- step 4: run
@@ -171,6 +157,15 @@ def _status_table(prog: dict, s: RunSettings) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["Stage", "What it does", "Status"])
 
 
+def _error_reason(log_text: str) -> str:
+    """Last error line of the log, without any folder paths."""
+    lines = [line.strip() for line in log_text.splitlines() if line.strip()]
+    err = next((line for line in reversed(lines) if re.match(r"^[\w.]+(Error|Exception)\b", line)), "")
+    if not err:
+        return "It was stopped."
+    return "Reason: " + re.sub(r"[A-Za-z]:\\[^'\"]*\\", "", err)
+
+
 @st.fragment(run_every=3)
 def _live_status() -> None:
     if not JOB:
@@ -187,8 +182,6 @@ def _live_status() -> None:
     done_n = len(prog["done"])
     st.progress(min(done_n / len(STAGES), 1.0), text=f"{done_n} of {len(STAGES)} stages complete · {mins:.1f} min")
     text_table(_status_table(prog, s))
-    with st.expander("Log (last 40 lines)"):
-        st.code("\n".join(text.splitlines()[-40:]) or "Starting...", language="text")
 
     if running:
         if st.button("Stop the run"):
@@ -203,10 +196,10 @@ def _live_status() -> None:
             st.cache_resource.clear()
         st.rerun(scope="app")
     if code == 0 and prog["finished"]:
-        st.success(f"Finished in {mins:.1f} minutes. Results saved in `{s.output_dir}`")
+        st.success(f"Finished in {mins:.1f} minutes.")
         _show_run_results(Path(s.output_dir))
     else:
-        st.error("The run stopped before it finished. The last lines of the log above show the reason.")
+        st.error(f"The run stopped before it finished. {_error_reason(text)}")
 
 
 def _show_run_results(out: Path) -> None:
@@ -223,9 +216,7 @@ def _show_run_results(out: Path) -> None:
         r = pd.read_csv(rates)
         st.write(f"Sales flagged as unusual: **{r.iloc[0]['flag_rate_%']:.1f}%** of standard sales.")
     if Path(out).resolve() != OUT.resolve():
-        st.write("These results are in a separate folder. To show them on all dashboard pages, copy them over "
-                 "the current results:")
-        if st.button("Use these results in the dashboard", type="primary"):
+        if st.button("Show these results on all dashboard pages", type="primary"):
             _use_results(out)
     else:
         st.info("The dashboard pages now show the new results.")
@@ -247,10 +238,9 @@ def _use_results(src: Path) -> None:
 # --------------------------------------------------------------------------- page
 def render() -> None:
     page_header("Run Pipeline",
-                "Run the whole pipeline again from the browser: clean the data, build the features, train and "
-                "compare the models, score unusual sales, explain the model and refresh the dashboard. Use it "
-                "with newer data (for example next year's sales) or with different settings, such as one "
-                "region or other split dates. The steps are the same as in the Data & Method page.",
+                "Run the full pipeline on new or updated data: clean the data, build the features, train and "
+                "compare the models, score unusual sales and refresh the dashboard. Years, region and split "
+                "dates can be changed.",
                 "reusability of the approach (Objective 1: a reusable dataset for selected years and regions)")
 
     if _running():
@@ -271,12 +261,10 @@ def render() -> None:
         problems.append(f"Only {free:.1f} GB of disk space is free; this run needs about {need:.0f} GB.")
     for p in problems:
         st.error(p)
-    with st.expander("Command that will be run"):
-        st.code(" ".join(f'"{c}"' if " " in c else c for c in build_command(s)), language="bash")
     if st.button("Run pipeline", type="primary", disabled=bool(problems)):
         _start(s)
         st.rerun()
 
-    if JOB:   # a finished run from earlier in this session
+    if JOB and JOB["log_path"].exists():   # a finished run from earlier in this session
         st.header("Last run")
         _live_status()

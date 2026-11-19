@@ -105,7 +105,7 @@ def render() -> None:
 
     st.subheader("Explain a flagged sale")
     if not app_data_ready():
-        st.info("Run `python prepare_dashboard.py` to enable explanations of individual sales.")
+        st.info("Explanations of individual sales are available after the pipeline has been run (Run Pipeline page).")
         return
     options = view.head(500)
     if options.empty:

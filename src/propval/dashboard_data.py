@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import Config
+from .config import Config, display_path
 
 log = logging.getLogger(__name__)
 
@@ -72,5 +72,5 @@ def prepare(cfg: Config, base: pd.DataFrame | None = None) -> dict[str, Path]:
         rows = std.loc[std["transaction_id"].isin(ids)]
         paths["flagged_rows"] = out / "flagged_rows.parquet"
         rows.to_parquet(paths["flagged_rows"], index=False)
-    log.info("Dashboard data written to %s", out)
+    log.info("Dashboard data written to %s", display_path(out))
     return paths
